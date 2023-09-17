@@ -3,12 +3,16 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { WebView } from "react-native-webview";
 
-export default function FetchHtmlContent({ url, onContentFetched, username, password }) {
+export default function FetchHtmlContent({
+  url,
+  onContentFetched,
+  username,
+  password,
+}) {
   const webViewRef = React.useRef(null);
   const [webViewUrl, setWebViewUrl] = useState(
     "https://webapp.yuntech.edu.tw/YunTechSSO/Account/Login"
   );
-  const [loginScriptInjected, setLoginScriptInjected] = useState(false);
 
   const getHTMLDataJS = () => `
     window.ReactNativeWebView.postMessage(document.documentElement.outerHTML);
@@ -23,49 +27,53 @@ export default function FetchHtmlContent({ url, onContentFetched, username, pass
 
   const loginJavaScript = () => {
     return `
-      if (document.getElementsByName('pLoginName').length > 0 && document.getElementsByName('pLoginPassword').length > 0) {
-        document.getElementsByName('pLoginName')[0].value = ${username};
-        document.getElementsByName('pLoginPassword')[0].value = ${password};
-        if (document.getElementById('LoginSubmitBtn')) {
-          document.getElementById('LoginSubmitBtn').click();
-        }
-      }
-      true;
+        setTimeout(() => {
+            try {
+                const usernameField = document.getElementsByName('pLoginName')[0];
+                const passwordField = document.getElementsByName('pLoginPassword')[0];
+                const loginButton = document.getElementById('LoginSubmitBtn');
+                
+                if (usernameField && passwordField && loginButton) {
+                    usernameField.value = '${username}';
+                    passwordField.value = '${password}';
+                    loginButton.click();
+                } else {
+                    window.ReactNativeWebView.postMessage('Elements not found');
+                }
+            } catch (e) {
+                window.ReactNativeWebView.postMessage('Error: ' + e.toString());
+            }
+        }, 100); // Wait for 0.1 seconds
+        true;
     `;
-  };
+};
+
+
 
   const handleNavigationStateChange = (newNavState) => {
-    if (newNavState.url === url) {
-      // webViewRef.current.injectJavaScript(getHTMLDataJS());
-    }else{
-      setWebViewUrl(
-        url
-      );
+    if (newNavState.loading === false && newNavState.url === url) {
+        webViewRef.current.injectJavaScript(getHTMLDataJS());
+    } else {
+        setWebViewUrl(url);
     }
-    webViewRef.current.injectJavaScript(getHTMLDataJS());
-  }
+};
+
 
   const injectLoginScript = () => {
-    // if (!loginScriptInjected) {
-      webViewRef.current.injectJavaScript(loginJavaScript());
-      setLoginScriptInjected(true);
-      setWebViewUrl(
-        url
-      );
-    // }
+    webViewRef.current.injectJavaScript(loginJavaScript());
+    setWebViewUrl(url);
   };
 
   return (
-      <WebView
-        ref={webViewRef}
-        originWhitelist={["*"]}
-        thirdPartyCookiesEnabled={true}
-        source={{ uri: webViewUrl }}
-        javaScriptEnabled={true}
-        onMessage={onMessage}
-        onLoadEnd={injectLoginScript}
-        onNavigationStateChange={handleNavigationStateChange}
-      />
-
+    <WebView
+      ref={webViewRef}
+      originWhitelist={["*"]}
+      thirdPartyCookiesEnabled={true}
+      source={{ uri: webViewUrl }}
+      javaScriptEnabled={true}
+      onMessage={onMessage}
+      onLoadEnd={injectLoginScript}
+      onNavigationStateChange={handleNavigationStateChange}
+    />
   );
 }

@@ -3,8 +3,6 @@ import { useState } from "react";
 
 export default function Student( username, password, onDataUpdated) {
 
-    const [htmlContent, setHtmlContent] = useState(null);
-
   return {
     getCourseList: () => {
       return (
