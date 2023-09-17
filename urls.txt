@@ -1,0 +1,3 @@
+//course selection
+https://webapp.yuntech.edu.tw/AAXCCS/CourseSelectionRegister.aspx
+https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Course/
