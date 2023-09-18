@@ -1,3 +1,4 @@
-import extractCourseDetails from "./extractCourseDetails";
+import extractCoursesList from "./extractCoursesList";
+import extractCoursesStudentList from "./extractCoursesStudentList";
 
-export { extractCourseDetails }
+export { extractCoursesList, extractCoursesStudentList }
