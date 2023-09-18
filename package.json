@@ -9,7 +9,6 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@fluentui/react-native": "^0.37.25",
     "@react-native-async-storage/async-storage": "1.18.2",
     "expo": "~49.0.11",
     "expo-status-bar": "~1.6.0",
