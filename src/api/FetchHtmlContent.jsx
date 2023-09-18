@@ -38,7 +38,7 @@ export default function FetchHtmlContent({
                     passwordField.value = '${password}';
                     loginButton.click();
                 } else {
-                    //window.ReactNativeWebView.postMessage('Elements not found');
+                    //window.ReactNativeWebView.postMessage('Elements not found'); // Logined
                 }
             } catch (e) {
                 window.ReactNativeWebView.postMessage('Error: ' + e.toString());
