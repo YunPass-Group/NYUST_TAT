@@ -20,6 +20,7 @@ export default function Student(username, password, onDataUpdated) {
         />
       );
     },
+    
     getCourseStudentList: (courseURL) => {
         return (
             <FetchHtmlContent

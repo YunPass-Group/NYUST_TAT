@@ -47,16 +47,16 @@ export default function App() {
         data = JSON.stringify(data);
         console.log(data);
         setHtmlContent(data);
-      }).getCourseSyllabusAndTeachingPlan('https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&8653')}
+      }).getCourseSyllabusAndTeachingPlan('https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&0105')}
 
-      <View style={{
+      {/* <View style={{
         position: "absolute",
         width: "100%",
         height: "100%",
         backgroundColor: "white",
       }}>
         <Text>{htmlContent}</Text>
-      </View>
+      </View> */}
     </View>
   );
 }

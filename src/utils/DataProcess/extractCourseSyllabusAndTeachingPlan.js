@@ -3,10 +3,19 @@ export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
     htmlContent = htmlContent.replace(/\\\"/g, '"');
 
     // Helper function to extract data using a pattern
-    const extractData = (pattern) => {
+    const extractData = (pattern, isMultiLine = false) => {
         const match = htmlContent.match(pattern);
-        return match ? match[1].trim() : null;
+        if (!match) return isMultiLine ? [] : null;
+        
+        if (isMultiLine) {
+            return match[1].split(/<br\s*\/?>|\n/)
+                          .map(line => line.trim())
+                          .filter(line => line !== '');  // Remove empty lines
+        }
+        return match[1].trim();
     };
+    
+    
 
     const extractAndSplitData = (pattern, splitter) => {
         const match = htmlContent.match(pattern);
@@ -99,7 +108,8 @@ export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
 
     function extractSchedule(schedule) {
         const rowPattern = /<tr class="GridView_.*?">([\s\S]*?)<\/tr>/g;
-        const cellPattern = /<span id=".*?">(.*?)<\/span>/;
+        const cellPattern = /<span id=".*?">([\s\S]*?)<\/span>/;
+        const urlPattern = /href="([\s\S]*?)"/;
     
         let match, cellMatch;
         let dataArray = [];
@@ -108,20 +118,22 @@ export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
             const rowContent = match[1];
             const cells = rowContent.split('</td>').slice(0, -1);  // split by cell and remove the last empty item
     
-            const weekRaw = cellPattern.exec(cells[0])[1];
-            const week = weekRaw.replace(/[^0-9]/g, '');  // Extract only numbers from the week string
-            const teachingContent = cellPattern.exec(cells[1])[1];
-            const teachingMethod = cellPattern.exec(cells[2])[1];
-            const remarks = cellPattern.exec(cells[3])[1];
-            const distanceTeachingUrl = /href="(.*?)"/.exec(cells[4]) ? /href="(.*?)"/.exec(cells[4])[1] : '';
+            const weekRaw = (cellPattern.exec(cells[0]) || [])[1];
+            const week = weekRaw ? weekRaw.replace(/[^0-9]/g, '') : '';  // Extract only numbers from the week string
+            const teachingContent = (cellPattern.exec(cells[1]) || [])[1] || '';
+            const teachingMethod = (cellPattern.exec(cells[2]) || [])[1] || '';
+            const remarks = (cellPattern.exec(cells[3]) || [])[1] || '';
+            const distanceTeachingUrl = (urlPattern.exec(cells[4]) || [])[1] || '';
     
-            dataArray.push({
-                week: week,
-                teachingContent: teachingContent,
-                teachingMethod: teachingMethod,
-                remarks: remarks,
-                distanceTeachingUrl: distanceTeachingUrl
-            });
+            if (week) {  // Only push data where week is not empty to avoid the header row
+                dataArray.push({
+                    week: week.trim(),
+                    teachingContent: teachingContent.trim(),
+                    teachingMethod: teachingMethod.trim(),
+                    remarks: remarks.trim(),
+                    distanceTeachingUrl: distanceTeachingUrl.trim()
+                });
+            }
         }
     
         return dataArray;
@@ -167,7 +179,7 @@ export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
             studentMax: extractNumericData(studentMaxPattern),
             instructorEmailAndExt: extractData(instructorEmailAndExtPattern),
             instructor: extractData(instructorPattern),
-            courseIntroduction: extractData(courseIntroductionPattern),
+            courseIntroduction: extractData(courseIntroductionPattern, true),
             teachingObjectives: extractAndSplitData(teachingObjectivesPattern, /<br\s*\/?>/),
             evaluationMethods: extractAndSplitData(evaluationMethodsPattern, /<br\s*\/?>/),
             officeHours: extractData(officeHoursPattern),
