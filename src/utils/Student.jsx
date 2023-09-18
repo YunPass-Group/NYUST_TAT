@@ -2,7 +2,7 @@ import { FetchHtmlContent } from "../api";
 import { useState } from "react";
 
 // handle data
-import { extractCoursesList, extractCoursesStudentList } from "./DataProcess/";
+import { extractCoursesList, extractCoursesStudentList, extractCourseSyllabusAndTeachingPlan } from "./DataProcess/";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -20,7 +20,7 @@ export default function Student(username, password, onDataUpdated) {
         />
       );
     },
-    getStudentList: (courseURL) => {
+    getCourseStudentList: (courseURL) => {
         return (
             <FetchHtmlContent
             url={courseURL}
@@ -32,5 +32,18 @@ export default function Student(username, password, onDataUpdated) {
             />
         );
     },
+
+    getCourseSyllabusAndTeachingPlan: (courseDetialsURL) => {
+        return (
+            <FetchHtmlContent
+            url={courseDetialsURL}
+            onContentFetched={(htmlContent) => {
+                onDataUpdated(extractCourseSyllabusAndTeachingPlan(htmlContent));
+            }}
+            username={username}
+            password={password}
+            />
+        );
+    }
   };
 }

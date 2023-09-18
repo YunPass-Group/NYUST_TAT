@@ -47,7 +47,7 @@ export default function App() {
         data = JSON.stringify(data);
         console.log(data);
         setHtmlContent(data);
-      }).getStudentList('https://webapp.yuntech.edu.tw/WebNewCAS/Course/StudList.aspx?acad_year=112&seme_type=1&current_subj=8653')}
+      }).getCourseSyllabusAndTeachingPlan('https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&8653')}
 
       <View style={{
         position: "absolute",
