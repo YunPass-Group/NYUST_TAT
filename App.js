@@ -47,7 +47,7 @@ export default function App() {
         data = JSON.stringify(data);
         console.log(data);
         setHtmlContent(data);
-      }).getCourseSyllabusAndTeachingPlan('https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&0105')}
+      }).getCourseSyllabusAndTeachingPlan('https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&8653')}
 
       {/* <View style={{
         position: "absolute",
