@@ -41,12 +41,15 @@ export default function App() {
         position: "relative",
       }}
     >
+
       {Student(account.username,account.password, (data) => {
         // data is a array of objects({Course Serial No, Curriculum No, Class Name, Department, Class Type, Credit, Time/Location, Instructor, Students Joined, Student Limit, Teaching Materials Website})
         data = JSON.stringify(data);
         console.log(data);
         setHtmlContent(data);
       }).getCourseList()}
+
+
       <View style={{
         position: "absolute",
         width: "100%",
