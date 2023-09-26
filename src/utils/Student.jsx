@@ -101,7 +101,7 @@ export default function Student(username, password, onDataUpdated) {
           key={index}
           url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Score/"
           onContentFetched={(htmlContent) => {
-            onDataUpdated(extractSemeseterFromYear(htmlContent));
+            onDataUpdated(extractSemeseterFromYear(htmlContent, semesterYear, ""));
           }}
           username={username}
           password={password}

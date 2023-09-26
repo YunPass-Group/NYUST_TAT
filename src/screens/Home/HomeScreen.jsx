@@ -57,7 +57,7 @@ export default function HomeScreen() {
           //this semester is corect like 1111
           if (semester !== undefined) 
             return Student("", "", (data) => {
-              console.log(data);
+              console.log(JSON.stringify(data));
             }).getCreditFromSemesterYear(semester, index)
         })
       }

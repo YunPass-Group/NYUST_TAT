@@ -1,6 +1,6 @@
 import { DOMParser } from 'react-native-html-parser';
 
-export default function extractTableFromHTML(htmlContent) {
+export default function extractTableFromHTML(htmlContent, acadSemeValue) {
     // Parse the HTML content
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
@@ -56,7 +56,7 @@ export default function extractTableFromHTML(htmlContent) {
             credits: credits,
             instructor: instructor,
             score: score,
-            remarks: remarks.filter(Boolean),
+            remarks: remarks,
             warning: warning,
         };
     };
@@ -83,5 +83,8 @@ export default function extractTableFromHTML(htmlContent) {
     });
 
     // Return the non-empty extracted data array
-    return nonEmptyData;
+    return  {
+        AcadSeme: acadSemeValue.replace('\"', '').replace('\"', ''),
+        Credits: nonEmptyData
+      };
 }
