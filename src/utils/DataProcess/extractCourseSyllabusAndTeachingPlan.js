@@ -55,7 +55,7 @@ export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
     const instructorDepartmentPattern = /<a[^>]*href="mailto:([^"]*)">([^<]*)<\/a>\(([^)]*)\)/;
     const studentMaxPattern = /<span[^>]*id="[^"]*_MainContent_CourLimitLabel"[^>]*>([\s\S]*?)<\/span>/;
     const instructorEmailAndExtPattern = /<span[^>]*id="[^"]*_MainContent_Teacher_emailAndTel"[^>]*>([^<]*)<\/span>/;
-    const instructorPattern = /<span[^>]*id="[^"]*_MainContent_CourRemarkLabel"[^>]*>([^<]*)<\/span>/;
+    const instructorPattern = /<span[^>]*id="[^"]*_MainContent_CourRemarkLabel"[^>]*>([\s\S]*?)<\/span>/;
     const courseIntroductionPattern = /<span[^>]*id="[^"]*_MainContent_CourseIntroductionLabel"[^>]*>([\s\S]*?)<\/span>/;
     const teachingObjectivesPattern = /<span[^>]*id="[^"]*_MainContent_TeachingObjectivesLabel"[^>]*>([\s\S]*?)<\/span>/;
     const evaluationMethodsPattern = /<span[^>]*id="[^"]*_MainContent_EvaluationMethodsLabel"[^>]*>([\s\S]*?)<\/span>/;
@@ -196,7 +196,7 @@ export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
             instructorDepartment: extractInstructorDepartment(),
             studentMax: extractNumericData(studentMaxPattern),
             instructorEmailAndExt: extractData(instructorEmailAndExtPattern),
-            instructor: extractData(instructorPattern),
+            instructor: extractData(instructorPattern).replace(/<br\s*\/?>/g, '').trim(),
             courseIntroduction: extractData(courseIntroductionPattern, true),
             teachingObjectives: extractAndSplitData(teachingObjectivesPattern, /<br\s*\/?>/),
             evaluationMethods: extractAndSplitData(evaluationMethodsPattern, /<br\s*\/?>/),

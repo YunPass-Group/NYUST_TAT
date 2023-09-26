@@ -57,9 +57,14 @@ export default function HomeScreen() {
           //this semester is corect like 1111
           if (semester !== undefined) 
             return Student("", "", (data) => {
-              console.log(JSON.stringify(data));
+              {/* console.log(JSON.stringify(data)); */}
             }).getCreditFromSemesterYear(semester, index)
         })
+      }
+      {
+        Student("", "", (data) => {
+          console.log(JSON.stringify(data));
+        }).getCourseSyllabusAndTeachingPlan("https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&8653")
       }
 
       {/* <View style={{
