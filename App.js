@@ -1,74 +1,34 @@
+import {
+  NavigationContainer, 
+  DefaultTheme,
+  DarkTheme,
+} from '@react-navigation/native';
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import Student from "./src/utils/Student";
+import { useColorScheme, Text } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//constant
+import { NYUSTTheme } from './src/constants/';
 
-export default function App() {
+// screens
+import { HomeScreen } from './src/screens/';
 
-  const [account, setAccount] = useState({
-    username: null,
-    password: null,
-  });
+const Tab = createBottomTabNavigator();
 
-  const [htmlContent, setHtmlContent] = useState("");
-  React.useEffect(() => {
-    try {
-      AsyncStorage.getItem('account').then((value) => {
-        if (value !== null) {
-          setAccount(JSON.parse(value));
-        }else{
-          console.log("No account");
-          setAccount({
-            username: "",
-            password: "",
-          });
-          AsyncStorage.setItem('account', JSON.stringify(account));
-          console.log(account);
-        }
-      });
-    }
-    catch (e) {
-      console.log(e);
-    }
-  }, []);
+function App() {
+  
+  const scheme = useColorScheme();
+  
 
   return (
-    <View
-      style={{
-        flex: 1,
-        position: "relative",
-      }}
-    >
-
-      {Student(account.username,account.password, (data) => {
-        // data is a array of objects({Course Serial No, Curriculum No, Class Name, Department, Class Type, Credit, Time/Location, Instructor, Students Joined, Student Limit, Teaching Materials Website})
-        data = JSON.stringify(data);
-        console.log(data);
-        setHtmlContent(data);
-      }).getCourseSyllabusAndTeachingPlan('https://webapp.yuntech.edu.tw/WebNewCAS/Course/Plan/Query.aspx?&112&1&8653')}
-
-      {/* <View style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        backgroundColor: "white",
-      }}>
-        <Text>{htmlContent}</Text>
-      </View> */}
-    </View>
+    <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme} >
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={HomeScreen} />
+        {/* <Tab.Screen name="Settings" component={() => <Text>hi</Text>} /> */}
+      </Tab.Navigator>
+      <StatusBar style={scheme === 'dark' ? "auto" : "light"} />
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    height: "100%",
-    width: "100%",
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: StatusBar.currentHeight || 50,
-  },
-});
+export default App;
