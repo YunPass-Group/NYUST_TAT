@@ -14,6 +14,10 @@ export default function extractTableFromHTML(htmlContent, acadSemeValue) {
         // Define a helper function to clean text
         const cleanText = (text) => (text ? text.trim().replace(/\s+/g, ' ').replace(/[\r\n]+/g, ' ') : '');
 
+        // Initialize variable to store extracted details website URL
+        let detailsWebsite = '';
+        let studentListURL = '';
+
         // Initialize variables to store extracted data
         let classText = '';
         let courseSerialNo = '';
@@ -44,6 +48,14 @@ export default function extractTableFromHTML(htmlContent, acadSemeValue) {
                 else if (id.includes('_remark_01') || id.includes('_remark_02')) remarks.push(cleanText(element.textContent));
                 else if (id.includes('_Warning_Flag')) warning = cleanText(element.textContent);
             }
+            // Check if id contains '_cour_cname' and element is an anchor tag
+            if (id.includes('_cour_cname') && element.tagName.toLowerCase() === 'a') {
+                detailsWebsite = "https://webapp.yuntech.edu.tw" + element.getAttribute('href');
+            }
+            // Check if id contains '_current_subj' and element is an anchor tag
+            if (id.includes('_current_subj') && element.tagName.toLowerCase() === 'a') {
+                studentListURL = "https://webapp.yuntech.edu.tw" + element.getAttribute('href');
+            }
         });
 
         return {
@@ -58,6 +70,8 @@ export default function extractTableFromHTML(htmlContent, acadSemeValue) {
             score: score,
             remarks: remarks,
             warning: warning,
+            detailsWebsite: detailsWebsite,
+            studentListURL: studentListURL,
         };
     };
 
@@ -83,8 +97,8 @@ export default function extractTableFromHTML(htmlContent, acadSemeValue) {
     });
 
     // Return the non-empty extracted data array
-    return  {
+    return {
         AcadSeme: acadSemeValue.replace('\"', '').replace('\"', ''),
         Credits: nonEmptyData
-      };
+    };
 }
