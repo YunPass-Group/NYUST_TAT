@@ -9,10 +9,25 @@ import {
   extractSemeseterFromYear
 } from "./DataProcess/";
 
-import {FetchHtmlContentCredit, FetchHtmlContentFromYear, FetchHtmlContent } from "../api/";
+import { FetchHtmlContentCredit, FetchHtmlContentFromYear, FetchHtmlContent } from "../api/";
 
 export default function Student(username, password, onDataUpdated) {
   return {
+
+    getSemeseterList: () => {
+      return (
+        <FetchHtmlContentCredit
+          url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Score/"
+          onContentFetched={(htmlContent) => {
+            // onDataUpdated(extractSemeseterCredit(htmlContent));
+            semesterList = htmlContent;
+            onDataUpdated(htmlContent);
+          }}
+          username={username}
+          password={password}
+        />
+      );
+    },
 
     //student information
 
@@ -31,13 +46,15 @@ export default function Student(username, password, onDataUpdated) {
 
     //course section
 
-    getCourseList: () => {
+    getCourseList: (year, index) => {
       return (
-        <FetchHtmlContent
+        <FetchHtmlContentFromYear
+          key={index}
           url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Course/"
           onContentFetched={(htmlContent) => {
-            onDataUpdated(extractCoursesList(htmlContent));
+            onDataUpdated(extractCoursesList(htmlContent, year));
           }}
+          semesterYear={year}
           username={username}
           password={password}
         />
@@ -58,7 +75,7 @@ export default function Student(username, password, onDataUpdated) {
     },
 
     getCourseSyllabusAndTeachingPlan: (courseDetialsURL) => {
-      if(courseDetialsURL === undefined || courseDetialsURL === null || courseDetialsURL === "") { 
+      if (courseDetialsURL === undefined || courseDetialsURL === null || courseDetialsURL === "") {
         throw new Error("courseDetialsURL is not defined or null or empty");
       }
       return (
@@ -75,29 +92,16 @@ export default function Student(username, password, onDataUpdated) {
 
     // TODO 選課流程/教師課程/校際選課/課程地圖
 
-    // credit section
 
-    getSemeseterList: () => {
-      let semesterList = [];
-      return (
-          <FetchHtmlContentCredit
-            url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Score/"
-            onContentFetched={(htmlContent) => {
-              // onDataUpdated(extractSemeseterCredit(htmlContent));
-              semesterList = htmlContent;
-              onDataUpdated(htmlContent);
-            }}
-            username={username}
-            password={password}
-          />
-      );
-    },
+
+
+    // credit section
 
     getCreditFromSemesterYear: (semesterYear, index) => {
       //this semesterYear something called when undified
-      if(semesterYear == undefined || semesterYear == null || semesterYear == "") return;
+      if (semesterYear == undefined || semesterYear == null || semesterYear == "") return;
       return (
-        <FetchHtmlContentFromYear 
+        <FetchHtmlContentFromYear
           key={index}
           url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Score/"
           onContentFetched={(htmlContent) => {

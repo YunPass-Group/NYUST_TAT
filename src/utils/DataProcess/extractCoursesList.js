@@ -1,4 +1,4 @@
-export default function extractCourseDetails(htmlContent) {
+export default function extractCourseDetails(htmlContent, year) {
     // Utility function to extract content based on id pattern and tag
     function extractContent(str, pattern, tag) {
         const regex = new RegExp(`<${tag}[^>]*id="[^"]*${pattern}[^"]*"[^>]*>(.*?)</${tag}>`, "i");
@@ -96,5 +96,7 @@ export default function extractCourseDetails(htmlContent) {
         };
     });
 
-    return courseData;
+    return {
+        Year: year.replace('\"', '').replace('\"', ''),
+        Courses: courseData};
 }

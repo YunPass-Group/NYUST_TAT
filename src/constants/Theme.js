@@ -8,11 +8,11 @@ const NYUSTTheme = {
     ...DefaultTheme,
     colors: {
         ...DefaultTheme.colors,
-        primary: '#FCCA46',
-        secondary: '#FE7F2D',
+        primary: '#2A9D8F',
+        secondary: '#E76F51',
         tertiary: '#A1C181',
         background: '#264653',
-        card: '#619B8A',
+        card: '#2A9D8F',
         text: '#F0F0F0',
     },
 };

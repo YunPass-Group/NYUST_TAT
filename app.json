@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.koukeneko.nyust-tat"
+      
     },
     "android": {
       "adaptiveIcon": {
