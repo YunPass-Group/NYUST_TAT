@@ -30,14 +30,7 @@ function Home() {
   });
 
   React.useEffect(() => {
-    setAccount({
-      username: "",
-      password: "",
-    })
-  }, []);
-
-  React.useEffect(() => {
-    console.log(student);
+    // console.log(student);
     console.log(account);
   }, [student])
 
@@ -58,10 +51,17 @@ function Home() {
       storage.save({
         key: "account",
         id: "account",
-        data: account,
+        data: {
+          username: '',
+          password: '',
+        },
       })
     }
-  }, [account])
+    setAccount({
+      username: '',
+      password: '',
+    })
+  }, [])
 
 
 

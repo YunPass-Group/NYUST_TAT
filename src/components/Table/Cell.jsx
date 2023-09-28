@@ -7,9 +7,9 @@ const Cell = ({
   isHeader = false,
   isTime = false,
   data = null,
+  finishLoaded = null,
 }) => {
-
-  data && console.log(data)
+  
 
   return (
     <TouchableOpacity

@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import storage from "./storage";
+
 // handle data
 import {
   extractCoursesList,
@@ -12,14 +14,50 @@ import {
 import { FetchHtmlContentCredit, FetchHtmlContentFromYear, FetchHtmlContent } from "../api/";
 
 export default function Student(username, password, onDataUpdated) {
+
+  const EmptyView = ({data, onContentFetched}) => {
+    return (
+      <View style={{
+        height: 0,
+      }}>{
+        onContentFetched(data)
+      }</View>
+      
+    )
+  }
   return {
 
     getSemeseterList: () => {
+
+      //TODO - chesk whether is saved, if not, get from api, otherwise, get from storage
+      // storage.load({
+      //   key: "semesterList",
+      //   id: "semesterList",
+      // })
+      // .then((semesterList) => {
+      //   console.warn("Loading offline data: ", JSON.stringify(semesterList.map(s => JSON.parse(JSON.parse(s)))));
+      //   return(
+      //     <EmptyView data={semesterList} onContentFetched={
+      //       (data) => {
+      //         onDataUpdated(data.map(s => JSON.parse(JSON.parse(s))));
+      //       }
+      //     }/>
+      //   )
+      // })
+        
+
       return (
         <FetchHtmlContentCredit
           url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Score/"
           onContentFetched={(htmlContent) => {
             // onDataUpdated(extractSemeseterCredit(htmlContent));
+            console.log("Getting semester list from NYUST server...");
+            //save to storage
+            storage.save({
+              key: "semesterList",
+              id: "semesterList",
+              data: htmlContent,
+            });
             semesterList = htmlContent;
             onDataUpdated(htmlContent);
           }}
@@ -52,7 +90,14 @@ export default function Student(username, password, onDataUpdated) {
           key={index}
           url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Course/"
           onContentFetched={(htmlContent) => {
-            onDataUpdated(extractCoursesList(htmlContent, year));
+            const data = extractCoursesList(htmlContent, year)
+            storage.save({
+              key: "courseList",
+              id: year,
+              data: data,
+            });
+            onDataUpdated(data);
+            
           }}
           semesterYear={year}
           username={username}

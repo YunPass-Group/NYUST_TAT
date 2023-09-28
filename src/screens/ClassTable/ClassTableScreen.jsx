@@ -1,6 +1,5 @@
-import { View, Text, Alert, ActivityIndicator, TouchableOpacity, ScrollView, StyleSheet, Platform, Pressable } from 'react-native'
+import { View, Text, Alert, ActivityIndicator, TouchableOpacity, ScrollView, StyleSheet, Platform, RefreshControl } from 'react-native'
 import React from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { BlurView } from "expo-blur";
 import { NYUSTTheme } from '../../constants';
@@ -9,11 +8,24 @@ import storage from '../../utils/storage';
 import { StatusBar } from 'expo-status-bar';
 const Stack = createNativeStackNavigator();
 import { Cell } from "../../components/Table"
+import { YearSelectDialog } from '../../components/Dialog/';
 
 const ClassTable = React.memo(({ semester }) => {
 
   const [account, setAccount] = React.useState(null);
   const [courses, setCourses] = React.useState(null);
+  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    // setCourses(null);
+    // setRefreshing(false);
+  }, []);
+
+  React.useEffect(() => {
+    courses && setRefreshing(false);
+  }, [courses])
+
   const tableColor = [
     '#FFCCBB',
     '#FFECB2',
@@ -36,28 +48,27 @@ const ClassTable = React.memo(({ semester }) => {
       .then((value) => {
         setAccount(value);
       });
-
-    storage.load({ key: 'courses', id: 'courses' })
-      .then((value) => {
-        setCourses(value);
-      })
-      .catch((err) => {
-        //fetches the courses
-
+    storage.load({
+      key: "courseList",
+      id: semester,
+    })
+      .then((data) => {
+        console.log("Found course list stored in storage");
+        setCourses(data);
       });
   }, [])
 
   const TableClassProcesser = (week, time) => {
     let result = null;
 
-    console.log('Processing for Week:', week, 'Time:', time);
+    // console.log('Processing for Week:', week, 'Time:', time);
 
     if (courses && courses.Courses) {
-      console.log('Courses Available:', courses.Courses);
+      // console.log('Courses Available:', courses.Courses);
 
       courses.Courses.forEach((course, index) => {
         const classTime = course.ClassTime;
-        console.log('Checking Course:', course['Class Name'], 'Week:', classTime.Week, 'Time:', classTime.Time);
+        // console.log('Checking Course:', course['Class Name'], 'Week:', classTime.Week, 'Time:', classTime.Time);
 
         if (classTime.Week === week && classTime.Time.includes(time)) {
           result = {
@@ -65,7 +76,7 @@ const ClassTable = React.memo(({ semester }) => {
             course: course,
             detailsWebsite: course['Details Website']
           };
-          console.log('Match Found:', result);
+          // console.log('Match Found:', result);
         }
       });
     }
@@ -74,15 +85,17 @@ const ClassTable = React.memo(({ semester }) => {
   }
 
 
-  const timeTable = ['07:10', '08:10', '09:10', '10:10', '11:10', '12:10', '13:10', '14:10', '15:10', '16:10', '17:10', '18:25', '19:20', '20:15', '21:10']
+  let timeTable = ['07:10', '08:10', '09:10', '10:10', '11:10', '12:10', '13:10', '14:10', '15:10', '16:10', '17:10', '18:25', '19:20', '20:15', '21:10']
   const timeTable2 = ['節次X', '節次A', '節次B', '節次C', '節次D', '節次Y', '節次E', '節次F', '節次G', '節次H', '節次Z', '節次I', '節次J', '節次K', '節次L']
+  timeTable = timeTable.map((time, index) => {
+    return time + '\n' + timeTable2[index]
+  })
   return (
     <>
-
       {
-        courses === null &&
+        (!refreshing && courses === null) &&
         <ActivityIndicator style={{ height: "100%", width: "100%", alignSelf: "center", backgroundColor: NYUSTTheme.colors.background }} size="large" />
-      }{courses !== null &&
+      }{
         <View style={{
           position: "absolute",
           top: 100,
@@ -93,14 +106,15 @@ const ClassTable = React.memo(({ semester }) => {
           flexDirection: "row",
           justifyContent: "space-around",
           alignItems: "center",
-          borderBottomWidth: 1,
-          shadowOpacity: 0.5,
-          shadowRadius: 10,
-          shadowColor: NYUSTTheme.colors.card,
-          shadowOffset: {
-            width: 0,
-            height: 10,
-          },
+          // borderBottomWidth: 1,
+          // shadowOpacity: 0.5,
+          // shadowRadius: 10,
+          // shadowColor: NYUSTTheme.colors.card,
+          // shadowOffset: {
+          //   width: 0,
+          //   height: 10,
+          // },
+          overflow: "hidden",
         }}>
           <BlurView
             tint="dark"
@@ -117,20 +131,54 @@ const ClassTable = React.memo(({ semester }) => {
           <Cell text="日" isHeader={true} />
         </View>
       }
-      <ScrollView style={{
-        flex: 1,
-        backgroundColor: NYUSTTheme.colors.background,
-        // position: "relative",
-        height: "100%",
-        // padding header bar,
-        paddingTop: Platform.OS === 'ios' ? 101 + 60 : 70 + 60,
+      {/* <View style={{
+        position: "absolute",
+        top: 160,
+        left: 0,
+        zIndex: 100,
+        width: "100%",
+        height: 60,
+        justifyContent: "center",
+        alignItems: "center",
       }}>
+        <Text style={{
+          color: NYUSTTheme.colors.primary,
+          fontSize: 20,
+          fontWeight: "bold",
+          textAlign: "center",
+        }}>下拉重新向學校網頁抓取課表</Text>
+      </View> */}
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            colors={[
+              NYUSTTheme.colors.primary,
+              NYUSTTheme.colors.secondary,
+              NYUSTTheme.colors.tertiary,
+              NYUSTTheme.colors.card,
+            ]}
+            titleColor='lightgray'
+            title={refreshing ? '正在和學校網頁溝通' : '下拉重新向學校網頁抓取課表'}
+            tintColor='lightgray'
+            progressViewOffset={160}
+            refreshing={refreshing}
+            onRefresh={onRefresh} />
+        }
+        style={{
+          flex: 1,
+          backgroundColor: NYUSTTheme.colors.background,
+          // position: "relative",
+          height: "100%",
+          // padding header bar,
+          paddingTop: Platform.OS === 'ios' ? 100 + 60 : 100 + 60,
+        }}>
         <StatusBar style="light" />
         {/* api */}
         <View style={{ height: 0, position: 'relative' }}>
-          {account &&
+          {((courses === null && account) || refreshing) &&
             Student(account.username, account.password, (data) => {
-              console.log(JSON.stringify(data))
+              {/* console.log(JSON.stringify(data)) */ }
+              console.log("Getting course list from NYUST server...");
               if (data) {
                 setCourses(data);
               }
@@ -148,13 +196,11 @@ const ClassTable = React.memo(({ semester }) => {
           alignItems: 'center',
           backgroundColor: NYUSTTheme.colors.background,
         }}>
-          {/* <Text>{JSON.stringify(account)}</Text>
-        <Text>{semester}</Text>
-        <Text>test</Text> */}
           {/* table */}
           {
 
             ['X', 'A', 'B', 'C', 'D', 'Y', 'E', 'F', 'G', 'H', 'Z', 'I', 'J', 'K', 'L'].map((_time, index) => {
+
               return <View
                 key={index}
                 style={{
@@ -172,12 +218,15 @@ const ClassTable = React.memo(({ semester }) => {
                 <Cell data={TableClassProcesser(week = 4, time = _time)} />
                 <Cell data={TableClassProcesser(week = 5, time = _time)} />
                 <Cell data={TableClassProcesser(week = 6, time = _time)} />
-                <Cell data={TableClassProcesser(week = 7, time = _time)} />
+                <Cell finishLoaded={() => {
+                  setIsLoaded(true)
+                  setRefreshing(false);
+                }} data={TableClassProcesser(week = 7, time = _time)} />
               </View>
             })
           }
           <View style={{
-            height: 144,
+            height: Platform.OS === 'ios' ? 143 : 160,
           }}>
 
           </View>
@@ -194,16 +243,23 @@ const ScreenWrapper = ({ semester }) => {
 };
 
 const ClassTableScreen = () => {
+  const [account, setAccount] = React.useState(null);
   const [semesterList, setSemesterList] = React.useState(null);
   const [selectedYear, setSelectedYear] = React.useState(null);
   const [selectionDialogVisible, setSelectionDialogVisible] = React.useState(false);
 
   React.useEffect(() => {
+
+    storage.load({ key: 'account', id: 'account' })
+      .then((value) => {
+        setAccount(value);
+      })
+
     storage.load({
       key: 'semesterList',
       id: 'semesterList',
     }).then((data) => {
-      console.log(JSON.stringify(data))
+      // console.log(JSON.stringify(data))
       setSemesterList(data);
       setSelectedYear(data[0]);
     }).catch((err) => {
@@ -213,10 +269,19 @@ const ClassTableScreen = () => {
   }, [])
 
   return (
-    <>
+    <>{
+      semesterList === null && account &&
+      Student(account.username, account.password, (data) => {
+
+        if (data) {
+          setSemesterList(data);
+          setSelectedYear(data[0]);
+        }
+      }).getSemeseterList()
+    }
       <Stack.Navigator>
         <Stack.Screen
-          name={`${selectedYear && (parseInt(selectedYear.replace('"', '').replace('"', '').substring(0, 3)) + 1) + "年 第" + "1112".charAt(3) + "學期"} 課表`}
+          name={`${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`}
           children={() => <ScreenWrapper semester={selectedYear} />}
           initialParams={{ selectedYear }}
           options={{
@@ -235,6 +300,12 @@ const ClassTableScreen = () => {
                   setSelectionDialogVisible(!selectionDialogVisible);
                 }}
                 style={{
+                  // backgroundColor: NYUSTTheme.colors.card,
+                  paddingHorizontal: 10,
+                  paddingVertical: 10,
+                  borderWidth: 1,
+                  borderColor: NYUSTTheme.colors.primary,
+                  borderRadius: 30,
                   flexDirection: "row",
                   justifyContent: "center",
                   alignItems: "center",
@@ -254,53 +325,12 @@ const ClassTableScreen = () => {
       </Stack.Navigator>
       {
         selectionDialogVisible &&
-        <View style={{
-          height: Platform.OS === 'ios' ? "80%" : "100%",
-          width: "100%",
-          position: "absolute",
-          top: Platform.OS === 'ios' ? 100 : 0,
-          Bottom: 144,
-          left: 0,
-          zIndex: 100,
-
-
-        }}>
-          <BlurView
-            tint="dark"
-            intensity={100}
-            style={StyleSheet.absoluteFill}
-          />
-          <Pressable
-            onPress={() => setSelectionDialogVisible(false)}
-            style={{ gap: 30, width: "100%", height: "100%", paddingHorizontal: 30, justifyContent: "center", }}>
-            {semesterList && semesterList.map((semester, index) => {
-              return <TouchableOpacity
-                key={index}
-                onPress={() => {
-                  if (semester !== selectedYear)
-                    setSelectedYear(semester);
-                  setSelectionDialogVisible(false);
-                }}
-                style={{
-                  height: 50,
-                  width: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderWidth: 1,
-                  borderColor: semester === selectedYear ? NYUSTTheme.colors.card : NYUSTTheme.colors.background,
-                  borderRadius: 30,
-                }}>
-                <Text style={{
-                  color: NYUSTTheme.colors.primary,
-                  fontSize: 15,
-                  fontWeight: "bold",
-                }}>
-                  {(parseInt(semester.replace('"', '').replace('"', '').substring(0, 3)) + 1) + "年 第" + "1112".charAt(3) + "學期"}
-                </Text>
-              </TouchableOpacity>
-            })}
-          </Pressable>
-        </View>
+        <YearSelectDialog
+          semesterList={semesterList}
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          setSelectionDialogVisible={setSelectionDialogVisible}
+        />
       }
     </>
   )
