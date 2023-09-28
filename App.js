@@ -41,15 +41,16 @@ function App() {
             height: Platform.OS === 'ios' ? 83 : 70,
             paddingBottom: Platform.OS === 'ios' ? 35 : 15,
             paddingTop: Platform.OS === 'ios' ? 0 : 15,
+            overflow: 'hidden',
           },
           tabBarActiveTintColor: '#2A9D8F',
-          tabBarBackground: Platform.OS === 'ios' ? () => (
+          tabBarBackground:  () => (
             <BlurView
               tint='dark'
               intensity={100}
               style={StyleSheet.absoluteFill}
             />
-          ) : () => null,
+          ),
         }}>
         <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <Ionicons name="ios-home" size={size} color={color} /> }} name="首頁" component={HomeScreen} />
         {/* <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <MaterialCommunityIcons name="bulletin-board" size={size} color={color} /> }} name="校園資訊" component={ClassTableScreen} /> */}

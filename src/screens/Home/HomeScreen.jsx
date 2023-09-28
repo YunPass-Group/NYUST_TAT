@@ -92,8 +92,6 @@ function Home() {
         })
       }
 
-
-
       {/* student info */}
       {
         Student(account.username, account.password, (data) => {
