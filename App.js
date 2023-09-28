@@ -17,6 +17,7 @@ import { NYUSTTheme } from './src/constants/';
 // screens
 import { HomeScreen } from './src/screens/';
 import ClassTableScreen from './src/screens/ClassTable/ClassTableScreen';
+import ProfileScreen from './src/screens/Profile/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -56,7 +57,7 @@ function App() {
         {/* <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <MaterialCommunityIcons name="bulletin-board" size={size} color={color} /> }} name="校園資訊" component={ClassTableScreen} /> */}
         {/* <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <Ionicons name="ios-calendar" size={size} color={color} /> }} name="行事曆" component={() => <Text>hi</Text>} /> */}
         <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <FontAwesome name="table" size={size} color={color} /> }} name="課表" component={ClassTableScreen} />
-        {/* <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <MaterialIcons name="account-circle" size={size} color={color} /> }} name="設定檔" component={() => <Text>hi</Text>} /> */}
+        <Tab.Screen options={{ headerShown: false, tabBarIcon: ({size, color}) => <MaterialIcons name="account-circle" size={size} color={color} /> }} name="設定檔" component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
