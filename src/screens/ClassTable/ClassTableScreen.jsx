@@ -1,6 +1,9 @@
-import { View, Text, Alert, ActivityIndicator, TouchableOpacity, ScrollView, StyleSheet, Platform, RefreshControl } from 'react-native'
+import { View, Text, Alert, ActivityIndicator, TouchableOpacity, ScrollView, StyleSheet, Platform, RefreshControl, Button } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+
 import { BlurView } from "expo-blur";
 import { NYUSTTheme } from '../../constants';
 import Student from '../../utils/Student';
@@ -9,8 +12,12 @@ import { StatusBar } from 'expo-status-bar';
 const Stack = createNativeStackNavigator();
 import { Cell } from "../../components/Table"
 import { YearSelectDialog } from '../../components/Dialog/';
+import CoursesDetials from '../Courses/CoursesDetials';
+import CoursesStudentList from '../Courses/CoursesStudentList';
 
 const ClassTable = React.memo(({ semester }) => {
+
+  const navigation = useNavigation();
 
   const [account, setAccount] = React.useState(null);
   const [courses, setCourses] = React.useState(null);
@@ -49,14 +56,14 @@ const ClassTable = React.memo(({ semester }) => {
       .then((value) => {
         setAccount(value);
       });
-      storage.load({
-        key: "courseList",
-        id: semester,
-      })
-        .then((data) => {
-          console.log("Found course list stored in storage");
-          setCourses(data);
-        });
+    storage.load({
+      key: "courseList",
+      id: semester,
+    })
+      .then((data) => {
+        console.log("Found course list stored in storage");
+        setCourses(data);
+      });
 
   }, [])
 
@@ -129,7 +136,7 @@ const ClassTable = React.memo(({ semester }) => {
       }{
         <View style={{
           position: "absolute",
-          top: 100,
+          top: 100 - 3,
           left: 0,
           zIndex: 100,
           width: "100%",
@@ -154,23 +161,6 @@ const ClassTable = React.memo(({ semester }) => {
           <Cell text="日" isHeader={true} />
         </View>
       }
-      {/* <View style={{
-        position: "absolute",
-        top: 160,
-        left: 0,
-        zIndex: 100,
-        width: "100%",
-        height: 60,
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-        <Text style={{
-          color: NYUSTTheme.colors.primary,
-          fontSize: 20,
-          fontWeight: "bold",
-          textAlign: "center",
-        }}>下拉重新向學校網頁抓取課表</Text>
-      </View> */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         indicatorStyle='none'
@@ -185,7 +175,7 @@ const ClassTable = React.memo(({ semester }) => {
             titleColor='lightgray'
             title={refreshing ? '正在和學校網頁溝通' : '下拉重新向學校網頁抓取課表'}
             tintColor='lightgray'
-            progressViewOffset={160}
+            progressViewOffset={160 - 3}
             refreshing={refreshing}
             onRefresh={onRefresh} />
         }
@@ -195,7 +185,7 @@ const ClassTable = React.memo(({ semester }) => {
           // position: "relative",
           height: "100%",
           // padding header bar,
-          paddingTop: Platform.OS === 'ios' ? 100 + 60 : 100 + 60,
+          paddingTop: Platform.OS === 'ios' ? 100 + 60 - 3 : 100 + 60 - 3,
         }}>
         <StatusBar style="light" />
         {/* api */}
@@ -235,18 +225,17 @@ const ClassTable = React.memo(({ semester }) => {
                   alignItems: "center",
                   backgroundColor: index % 2 === 0 ? '#1C333D' : NYUSTTheme.colors.background,
                 }}>
-
                 <Cell text={timeTable[index]} isTime={true} />
-                <Cell data={TableClassProcesser(week = 1, time = _time)} />
-                <Cell data={TableClassProcesser(week = 2, time = _time)} />
-                <Cell data={TableClassProcesser(week = 3, time = _time)} />
-                <Cell data={TableClassProcesser(week = 4, time = _time)} />
-                <Cell data={TableClassProcesser(week = 5, time = _time)} />
-                <Cell data={TableClassProcesser(week = 6, time = _time)} />
-                <Cell finishLoaded={() => {
-                  setIsLoaded(true)
-                  setRefreshing(false);
-                }} data={TableClassProcesser(week = 7, time = _time)} />
+                {[1, 2, 3, 4, 5, 6, 7].map((_week, _index) =>
+                  <Cell
+                    key={_time + _week}
+                    data={TableClassProcesser(week = _week, time = _time)}
+                    onPress={(url, className, stdurl) => {
+                      console.log(url, className)
+                      navigation.navigate('CoursesDetials', { url: url, className: className, stdurl: stdurl })
+                    }}
+                  />
+                )}
               </View>
             })
           }
@@ -264,7 +253,7 @@ const ClassTable = React.memo(({ semester }) => {
 
 const ScreenWrapper = ({ semester }) => {
   if (!semester) return <ActivityIndicator size="large" />;
-  return <ClassTable semester={semester}/>;
+  return <ClassTable semester={semester} />;
 };
 
 
@@ -273,7 +262,7 @@ const ClassTableScreen = () => {
   const [semesterList, setSemesterList] = React.useState(null);
   const [selectedYear, setSelectedYear] = React.useState(null);
   const [selectionDialogVisible, setSelectionDialogVisible] = React.useState(false);
-
+  const navigation = useNavigation();
   React.useEffect(() => {
 
     storage.load({ key: 'account', id: 'account' })
@@ -294,6 +283,30 @@ const ClassTableScreen = () => {
     });
   }, [])
 
+  const headerOptions = Platform.OS === 'android' ? {
+    headerBackground: () => (
+      <BlurView
+        tint="dark"
+        intensity={100}
+        style={StyleSheet.absoluteFill}
+      />
+    ),
+    headerLeft: () => (
+      <TouchableOpacity style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginLeft: 10,
+      }} onPress={() => navigation.navigate('ClassTableScreen')} >
+        <Ionicons name="ios-chevron-back" size={24} color={NYUSTTheme.colors.primary} />
+        <Text style={{
+          fontSize: 18,
+          color: NYUSTTheme.colors.primary,
+        }}>回{selectedYear && selectedYear.replace('"', '').replace('"', '')}課表</Text>
+      </TouchableOpacity>
+    ),
+  } : {};
+
   return (
     <>
       {/* {
@@ -307,11 +320,12 @@ const ClassTableScreen = () => {
     } */}
       <Stack.Navigator>
         <Stack.Screen
-        name='ClassTableScreen'
+          name='ClassTableScreen'
           //name={`${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`}
           children={() => <ScreenWrapper semester={selectedYear} />}
           initialParams={{ selectedYear }}
           options={{
+            
             headerTransparent: true,
             headerShadowVisible: true,
             headerTitle: `${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`,
@@ -322,35 +336,87 @@ const ClassTableScreen = () => {
                 style={StyleSheet.absoluteFill}
               />
             ),
+            // headerBlurEffect: "dark",
             headerRight: () => (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectionDialogVisible(!selectionDialogVisible);
-                }}
-                style={{
-                  // backgroundColor: NYUSTTheme.colors.card,
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                  borderWidth: 1,
-                  borderColor: NYUSTTheme.colors.primary,
-                  borderRadius: 30,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}>
-                <Text style={{
-                  color: NYUSTTheme.colors.primary,
-                  fontSize: 15,
-                  fontWeight: "bold",
-                }}>
-                  切換學期
-                </Text>
-              </TouchableOpacity>
+              Platform.OS === 'ios' ? (
+                <Button
+                  onPress={() => {
+                    setSelectionDialogVisible(!selectionDialogVisible);
+                  }}
+                  color={NYUSTTheme.colors.primary}
+                  title="切換學期"
+                  style={{
+                    // backgroundColor: NYUSTTheme.colors.card,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
+                    borderWidth: 1,
+                    borderColor: NYUSTTheme.colors.primary,
+                    borderRadius: 30,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}>
+                </Button>
+              ) :
+                (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectionDialogVisible(!selectionDialogVisible);
+                    }}
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 10,
+                      borderRadius: 30,
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
+                    <Text style={{
+                      color: NYUSTTheme.colors.primary,
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}>切換學期</Text>
+                  </TouchableOpacity>
+                )
             )
           }}
 
         />
+        <Stack.Screen
+          name="CoursesDetials"
+          component={CoursesDetials}
+          options={{
+            ...headerOptions,
+            title: "課程資料",
+            gestureEnabled: true,
+            presentation: Platform.OS === 'ios' ? 'modal' : 'card',
+            backgroundColor: 'transparent',
+            headerTransparent:  true,
+            headerShadowVisible: true,
+            headerBlurEffect: "regular",
+            // headerLargeTitleShadowVisible: true,
+            // headerLargeTitle: true,
+          }}
+        />
+        <Stack.Screen
+          name="CoursesStudentList"
+          component={CoursesStudentList}
+          options={{
+            ...headerOptions,
+            title: "學生名單",
+            gestureEnabled: true,
+            presentation: Platform.OS === 'ios' ? 'modal' : 'card',
+            backgroundColor: 'transparent',
+            headerTransparent:  true,
+            headerShadowVisible: true,
+            headerBlurEffect: "regular",
+            // headerLargeTitleShadowVisible: true,
+            // headerLargeTitle: true,
+          }}
+        />
       </Stack.Navigator>
+
       {
         selectionDialogVisible &&
         <YearSelectDialog

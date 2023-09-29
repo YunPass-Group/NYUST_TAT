@@ -7,7 +7,7 @@ const Cell = ({
   isHeader = false,
   isTime = false,
   data = null,
-  finishLoaded = null,
+  onPress = null,
 }) => {
 
   
@@ -15,6 +15,11 @@ const Cell = ({
     <TouchableOpacity
       onPress={() => {
         // navigation to the details screen
+        onPress && data &&  onPress(
+          data["course"]['Details Website'],
+          data["course"]['Class Name'],
+          data["course"]["Student List URL"],
+        );
       }}
       style={{
         flex: 1,

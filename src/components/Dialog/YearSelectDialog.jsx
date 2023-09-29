@@ -58,8 +58,9 @@ const YearSelectDialog = ({
                 () => setIsPressing(index)
               }
               onPress={() => {
-                setIsSpinnerVisible(true)
-                handleSemesterSelection(semester);
+                
+                // setIsSpinnerVisible(true)
+                
                 }
               }
               onPressOut={() => {
@@ -68,8 +69,9 @@ const YearSelectDialog = ({
                 // if (semester !== selectedYear){
                 //   setSelectedYear(semester);
                 // }
-                setIsSpinnerVisible(true);
-                setIsSpinnerVisible(false)
+                // setIsSpinnerVisible(true);
+                // setIsSpinnerVisible(false)
+                handleSemesterSelection(semester);
                 setSelectionDialogVisible(false)
               }}
               style={{

@@ -167,7 +167,13 @@ export default function Student(username, password, onDataUpdated) {
         <FetchHtmlContent
           url={courseDetialsURL}
           onContentFetched={(htmlContent) => {
-            onDataUpdated(extractCourseSyllabusAndTeachingPlan(htmlContent));
+            const data = extractCourseSyllabusAndTeachingPlan(htmlContent)
+            storage.save({
+              key: "courseSyllabusAndTeachingPlan",
+              id: courseDetialsURL,
+              data: data,
+            });
+            onDataUpdated(data);
           }}
           username={username}
           password={password}
