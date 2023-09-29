@@ -15,14 +15,14 @@ import { FetchHtmlContentCredit, FetchHtmlContentFromYear, FetchHtmlContent } fr
 
 export default function Student(username, password, onDataUpdated) {
 
-  const EmptyView = ({data, onContentFetched}) => {
+  const EmptyView = ({ data, onContentFetched }) => {
     return (
       <View style={{
         height: 0,
       }}>{
-        onContentFetched(data)
-      }</View>
-      
+          onContentFetched(data)
+        }</View>
+
     )
   }
   return {
@@ -44,7 +44,7 @@ export default function Student(username, password, onDataUpdated) {
       //     }/>
       //   )
       // })
-        
+
 
       return (
         <FetchHtmlContentCredit
@@ -85,19 +85,59 @@ export default function Student(username, password, onDataUpdated) {
     //course section
 
     getCourseList: (year, index) => {
+
+      const tableColor = [
+        '#FFCCBB',
+        '#FFECB2',
+        '#FFCDD2',
+        '#B3E5FC',
+        '#B2DFDD',
+        '#C8E6CA',
+        '#F0F5C2',
+        '#DDEDC8',
+        '#FEE0B2',
+        '#FEFAC2',
+        '#E2BEE8',
+        '#F9BBD0',
+    
+      ]
+
       return (
         <FetchHtmlContentFromYear
           key={index}
           url="https://webapp.yuntech.edu.tw/WebNewCAS/StudentFile/Course/"
           onContentFetched={(htmlContent) => {
             const data = extractCoursesList(htmlContent, year)
+            //process mapping
+            const initialCourseMapping = {};
+
+            if (data && data.Courses) {
+              data.Courses.forEach((course, table_row) => {
+                const classTime = course.ClassTime;
+                //"ClassTime":{"Week":2,"Time":["C","D"]}
+                if (classTime) {
+                  // console.log(classTime.Week, classTime.Time);
+                  (classTime.Week && classTime.Time.length > 0) && classTime.Time.forEach((time, index) => {
+                    const key = `${classTime.Week}_${time}`;
+
+                    // initialCourseMapping[key] = [];
+                    initialCourseMapping[key] = {
+                      course: course,
+                      color: tableColor[table_row % tableColor.length],
+                    };
+                    // console.warn(initialCourseMapping[key]);
+                  });
+
+                }
+              });
+            }
             storage.save({
               key: "courseList",
               id: year,
-              data: data,
+              data: initialCourseMapping,
             });
-            onDataUpdated(data);
-            
+            onDataUpdated(initialCourseMapping);
+            console.log(JSON.stringify(initialCourseMapping));
           }}
           semesterYear={year}
           username={username}

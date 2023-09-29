@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text } from 'react-native'
+import { TouchableOpacity, Text, View } from 'react-native'
 import React from 'react'
 import { NYUSTTheme } from '../../constants'
 
@@ -9,8 +9,8 @@ const Cell = ({
   data = null,
   finishLoaded = null,
 }) => {
-  
 
+  
   return (
     <TouchableOpacity
       onPress={() => {
@@ -22,7 +22,7 @@ const Cell = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 3,
-        backgroundColor: data ? data.color : 'none',
+        backgroundColor: data ? data.color : 'transparent',
         width: "12.5%",
         height: 90,
         margin: 1,
@@ -38,7 +38,7 @@ const Cell = ({
         // backgroundColor: 'red',
         textAlign: 'center',
         fontSize: isTime ? 12 : 12,
-      }}>{text ? text : data ? data["course"]['Class Name'] : ''}</Text>
+      }}>{text ? text : (data && data["course"] ? data["course"]['Class Name'] : '')}</Text>
     </TouchableOpacity>
   )
 }

@@ -1,24 +1,24 @@
-import { View, Text, StyleSheet, Platform, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, Platform, Pressable, Touchable, ActivityIndicator } from 'react-native'
 import { BlurView } from "expo-blur";
 import { NYUSTTheme } from '../../constants';
 import React from 'react'
 
 const YearSelectDialog = ({
-    semesterList,
-    selectedYear,
-    setSelectedYear,
-    setSelectionDialogVisible
+  semesterList,
+  selectedYear,
+  setSelectedYear,
+  setSelectionDialogVisible
 }) => {
 
   const [isSpinnerVisible, setIsSpinnerVisible] = React.useState(false);
 
   const handleSemesterSelection = async (semester) => {
-    
-   
+
+
     if (semester !== selectedYear) {
       // Perform any async operations here before updating the state
       await setSelectedYear(semester);
-      
+
       // setSelectedYear(semester);
 
       // If you need to perform async operations after updating the state,
@@ -28,10 +28,10 @@ const YearSelectDialog = ({
     setIsSpinnerVisible(false);
     setSelectionDialogVisible(false);
   };
-
+  const [isPressing, setIsPressing] = React.useState(-1)
   return (
     <>
-    {isSpinnerVisible && <ActivityIndicator style={{ height: "100%", width: "100%", alignSelf: "center" }} size="large" />}
+      {isSpinnerVisible && <ActivityIndicator style={{ height: "100%", width: "100%", alignSelf: "center" }} size="large" />}
       {!isSpinnerVisible && <View style={{
         height: Platform.OS === 'ios' ? "80%" : "100%",
         width: "100%",
@@ -52,16 +52,25 @@ const YearSelectDialog = ({
           onPress={() => setSelectionDialogVisible(false)}
           style={{ gap: 30, width: "100%", height: "100%", paddingHorizontal: 30, justifyContent: "center", }}>
           {semesterList && semesterList.map((semester, index) => {
-            return <TouchableOpacity
+            return <Pressable
               key={index}
+              onPressIn={
+                () => setIsPressing(index)
+              }
               onPress={() => {
+                setIsSpinnerVisible(true)
+                handleSemesterSelection(semester);
+                }
+              }
+              onPressOut={() => {
                 // setIsSpinnerVisible(true);
                 // setSelectionDialogVisible(false);
                 // if (semester !== selectedYear){
                 //   setSelectedYear(semester);
                 // }
                 setIsSpinnerVisible(true);
-                handleSemesterSelection(semester);
+                setIsSpinnerVisible(false)
+                setSelectionDialogVisible(false)
               }}
               style={{
                 height: 50,
@@ -69,17 +78,17 @@ const YearSelectDialog = ({
                 justifyContent: "center",
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: semester === selectedYear ? NYUSTTheme.colors.card : NYUSTTheme.colors.background,
+                borderColor: (semester === selectedYear) ? NYUSTTheme.colors.card : isPressing === index? NYUSTTheme.colors.secondary : NYUSTTheme.colors.background,
                 borderRadius: 30,
               }}>
               <Text style={{
-                color: NYUSTTheme.colors.primary,
+                color: isPressing === index && semester !== selectedYear ? NYUSTTheme.colors.secondary : NYUSTTheme.colors.primary,
                 fontSize: 15,
                 fontWeight: "bold",
               }}>
-                {Math.trunc((parseInt(semester.replace('"', '').replace('"', ''))/10)) + "年 第" + parseInt(semester.replace('"', '').replace('"', ''))%10 + "學期"}
+                {isPressing !== index || semester === selectedYear ? Math.trunc((parseInt(semester.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(semester.replace('"', '').replace('"', '')) % 10 + "學期" : '載入中'}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           })}
         </Pressable>
       </View>}

@@ -16,6 +16,7 @@ const ClassTable = React.memo(({ semester }) => {
   const [courses, setCourses] = React.useState(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     // setCourses(null);
@@ -48,6 +49,19 @@ const ClassTable = React.memo(({ semester }) => {
       .then((value) => {
         setAccount(value);
       });
+      storage.load({
+        key: "courseList",
+        id: semester,
+      })
+        .then((data) => {
+          console.log("Found course list stored in storage");
+          setCourses(data);
+        });
+
+  }, [])
+
+  React.useEffect(() => {
+    setCourses(null);
     storage.load({
       key: "courseList",
       id: semester,
@@ -56,40 +70,57 @@ const ClassTable = React.memo(({ semester }) => {
         console.log("Found course list stored in storage");
         setCourses(data);
       });
-  }, [])
+  }, [semester])
 
   const TableClassProcesser = (week, time) => {
-    let result = null;
+    try {
+      const key = week + "_" + time;
+      let result = null;
 
-    // console.log('Processing for Week:', week, 'Time:', time);
+      // // console.log('Processing for Week:', week, 'Time:', time);
 
-    if (courses && courses.Courses) {
-      // console.log('Courses Available:', courses.Courses);
+      // if (courses && courses.Courses) {
+      //   // console.log('Courses Available:', courses.Courses);
 
-      courses.Courses.forEach((course, index) => {
-        const classTime = course.ClassTime;
-        // console.log('Checking Course:', course['Class Name'], 'Week:', classTime.Week, 'Time:', classTime.Time);
+      //   courses.Courses.forEach((course, index) => {
+      //     const classTime = course.ClassTime;
+      //     // console.log('Checking Course:', course['Class Name'], 'Week:', classTime.Week, 'Time:', classTime.Time);
 
-        if (classTime.Week === week && classTime.Time.includes(time)) {
-          result = {
-            color: tableColor[index % tableColor.length],
-            course: course,
-            detailsWebsite: course['Details Website']
-          };
-          // console.log('Match Found:', result);
-        }
-      });
+      //     if (classTime.Week === week && classTime.Time.includes(time)) {
+      //       result = {
+      //         color: tableColor[index % tableColor.length],
+      //         course: course,
+      //         detailsWebsite: course['Details Website']
+      //       };
+      //       // console.log('Match Found:', result);
+      //     }
+      //   });
+      // }
+      // console.log(courses);
+      return courses[key] !== undefined ? courses[key] : null;
+    } catch (err) {
+      //Course not found
     }
-
-    return result;
   }
 
 
-  let timeTable = ['07:10', '08:10', '09:10', '10:10', '11:10', '12:10', '13:10', '14:10', '15:10', '16:10', '17:10', '18:25', '19:20', '20:15', '21:10']
-  const timeTable2 = ['節次X', '節次A', '節次B', '節次C', '節次D', '節次Y', '節次E', '節次F', '節次G', '節次H', '節次Z', '節次I', '節次J', '節次K', '節次L']
-  timeTable = timeTable.map((time, index) => {
-    return time + '\n' + timeTable2[index]
-  })
+  let timeTable = [
+    "07:10\n節次X",
+    "08:10\n節次A",
+    "09:10\n節次B",
+    "10:10\n節次C",
+    "11:10\n節次D",
+    "12:10\n節次Y",
+    "13:10\n節次E",
+    "14:10\n節次F",
+    "15:10\n節次G",
+    "16:10\n節次H",
+    "17:10\n節次Z",
+    "18:25\n節次I",
+    "19:20\n節次J",
+    "20:15\n節次K",
+    "21:10\n節次L"
+  ]
   return (
     <>
       {
@@ -106,14 +137,6 @@ const ClassTable = React.memo(({ semester }) => {
           flexDirection: "row",
           justifyContent: "space-around",
           alignItems: "center",
-          // borderBottomWidth: 1,
-          // shadowOpacity: 0.5,
-          // shadowRadius: 10,
-          // shadowColor: NYUSTTheme.colors.card,
-          // shadowOffset: {
-          //   width: 0,
-          //   height: 10,
-          // },
           overflow: "hidden",
         }}>
           <BlurView
@@ -149,6 +172,8 @@ const ClassTable = React.memo(({ semester }) => {
         }}>下拉重新向學校網頁抓取課表</Text>
       </View> */}
       <ScrollView
+        showsVerticalScrollIndicator={false}
+        indicatorStyle='none'
         refreshControl={
           <RefreshControl
             colors={[
@@ -211,7 +236,7 @@ const ClassTable = React.memo(({ semester }) => {
                   backgroundColor: index % 2 === 0 ? '#1C333D' : NYUSTTheme.colors.background,
                 }}>
 
-                <Cell text={timeTable[index]} text2={timeTable2[index]} isTime={true} />
+                <Cell text={timeTable[index]} isTime={true} />
                 <Cell data={TableClassProcesser(week = 1, time = _time)} />
                 <Cell data={TableClassProcesser(week = 2, time = _time)} />
                 <Cell data={TableClassProcesser(week = 3, time = _time)} />
@@ -239,8 +264,9 @@ const ClassTable = React.memo(({ semester }) => {
 
 const ScreenWrapper = ({ semester }) => {
   if (!semester) return <ActivityIndicator size="large" />;
-  return <ClassTable semester={semester} />;
+  return <ClassTable semester={semester}/>;
 };
+
 
 const ClassTableScreen = () => {
   const [account, setAccount] = React.useState(null);
@@ -269,24 +295,26 @@ const ClassTableScreen = () => {
   }, [])
 
   return (
-    <>{
+    <>
+      {/* {
       semesterList === null && account &&
       Student(account.username, account.password, (data) => {
-
         if (data) {
           setSemesterList(data);
           setSelectedYear(data[0]);
         }
       }).getSemeseterList()
-    }
+    } */}
       <Stack.Navigator>
         <Stack.Screen
-          name={`${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`}
+        name='ClassTableScreen'
+          //name={`${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`}
           children={() => <ScreenWrapper semester={selectedYear} />}
           initialParams={{ selectedYear }}
           options={{
             headerTransparent: true,
             headerShadowVisible: true,
+            headerTitle: `${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`,
             headerBackground: () => (
               <BlurView
                 tint="dark"
