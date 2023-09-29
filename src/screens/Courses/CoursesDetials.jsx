@@ -108,7 +108,7 @@ const CoursesDetials = ({ route = null }) => {
                         progressViewOffset={Platform.OS === 'android' ? 105 : 55 - 3}
                         onRefresh={onRefresh} />
                 }
-                showsVerticalScrollIndicator={false}
+                // showsVerticalScrollIndicator={false}
                 style={{
                     backgroundColor: NYUSTTheme.colors.background,
                     paddingTop: Platform.OS === 'android' ? 105 : 55,
@@ -273,7 +273,7 @@ const CoursesDetials = ({ route = null }) => {
 
                 {/* footer */}
                 <View style={{
-                    height: 90,
+                    height: Platform.OS === 'android' ? 200 : 90,
                 }}>
                 </View>
             </ScrollView>
