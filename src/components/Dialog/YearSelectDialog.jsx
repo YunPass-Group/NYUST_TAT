@@ -71,7 +71,8 @@ const YearSelectDialog = ({
                 // }
                 // setIsSpinnerVisible(true);
                 // setIsSpinnerVisible(false)
-                handleSemesterSelection(semester);
+                // handleSemesterSelection(semester);
+                setSelectedYear(semester)
                 setSelectionDialogVisible(false)
               }}
               style={{

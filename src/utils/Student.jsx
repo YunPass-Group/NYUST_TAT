@@ -147,11 +147,18 @@ export default function Student(username, password, onDataUpdated) {
     },
 
     getCourseStudentList: (courseURL) => {
+      console.log("Getting course list from NYUST website ...");
       return (
         <FetchHtmlContent
           url={courseURL}
           onContentFetched={(htmlContent) => {
-            onDataUpdated(extractCoursesStudentList(htmlContent));
+            const data =  extractCoursesStudentList(htmlContent)
+            storage.save({
+              key: "courseStudentList",
+              id: courseURL,
+              data: data,
+            });
+            onDataUpdated(data);
           }}
           username={username}
           password={password}
@@ -163,11 +170,13 @@ export default function Student(username, password, onDataUpdated) {
       if (courseDetialsURL === undefined || courseDetialsURL === null || courseDetialsURL === "") {
         throw new Error("courseDetialsURL is not defined or null or empty");
       }
+      
       return (
         <FetchHtmlContent
           url={courseDetialsURL}
           onContentFetched={(htmlContent) => {
             const data = extractCourseSyllabusAndTeachingPlan(htmlContent)
+            console.log(data)
             storage.save({
               key: "courseSyllabusAndTeachingPlan",
               id: courseDetialsURL,

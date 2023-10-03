@@ -12,6 +12,21 @@ const CoursesDetials = ({ route = null }) => {
     const [data, setData] = React.useState(null)
     const [refreshing, setRefreshing] = React.useState(false);
 
+    const renderedJSXRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if ((data === null && account) || (refreshing && account)) {
+            renderedJSXRef.current = Student(account.username, account.password, (fetchedData) => {
+                setData(fetchedData);
+                setTimeout(() => {
+                    setRefreshing(false);
+                    console.log("Getting course syllabus and teaching plan from NYUST server... Done!");
+                }, 1000);
+            }).getCourseSyllabusAndTeachingPlan(route.params.url);
+        }
+    }, [data, account, refreshing, route]);
+
+
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
     }, []);
@@ -42,7 +57,7 @@ const CoursesDetials = ({ route = null }) => {
                         {value && value.map((item, index) => (
                             <Text
                                 key={index}
-                                style={{ fontWeight: 'normal', fontSize: 15, color: NYUSTTheme.colors.text, paddingLeft: 26 }}>
+                                style={{ fontWeight: 'normal', fontSize: 15, color: NYUSTTheme.colors.text, paddingLeft: 27 }}>
                                 {item}
                             </Text>
                         ))}
@@ -151,7 +166,7 @@ const CoursesDetials = ({ route = null }) => {
                         />
                     ))
                 }
-                <View style={{ paddingHorizontal: 30, paddingVertical: 15, paddingBottom: 30 ,flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center', backgroundColor: '#1C333D' }}>
+                <View style={{ paddingHorizontal: 30, paddingVertical: 15, paddingBottom: 30, flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center', backgroundColor: '#1C333D' }}>
                     <View>
                         <View style={{ flex: 1, flexDirection: 'row', gap: 10, marginBottom: 30 }}>
                             <Foundation name="paperclip" size={24} color={NYUSTTheme.colors.text} />
@@ -165,7 +180,7 @@ const CoursesDetials = ({ route = null }) => {
                     }}>
                         <TouchableOpacity
                             onPress={() => {
-
+                                navigation.navigate('CoursesTextBooks', { books: data['Textbooks']})
                             }}
                             style={{
                                 height: 50,
@@ -187,7 +202,7 @@ const CoursesDetials = ({ route = null }) => {
 
                         <TouchableOpacity
                             onPress={() => {
-
+                                navigation.navigate('CoueseSchedule', { schedule: data['Schedule']})
                             }}
                             style={{
                                 height: 50,
@@ -209,7 +224,7 @@ const CoursesDetials = ({ route = null }) => {
 
                         <TouchableOpacity
                             onPress={() => {
-
+                                navigation.navigate('coueseCoreCompetencies', { CoreCompetencies: data['CoreCompetencies']})
                             }}
                             style={{
                                 height: 50,
@@ -231,7 +246,7 @@ const CoursesDetials = ({ route = null }) => {
                     </View>
                 </View>
 
-                <View style={{ paddingHorizontal: 30, paddingVertical: 15, paddingBottom: 30 ,flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center', backgroundColor: NYUSTTheme.colors.background }}>
+                <View style={{ paddingHorizontal: 30, paddingVertical: 15, paddingBottom: 30, flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center', backgroundColor: NYUSTTheme.colors.background }}>
                     <View>
                         <View style={{ flex: 1, flexDirection: 'row', gap: 10, marginBottom: 30 }}>
                             <Foundation name="paperclip" size={24} color={NYUSTTheme.colors.text} />
@@ -245,7 +260,7 @@ const CoursesDetials = ({ route = null }) => {
                     }}>
                         <TouchableOpacity
                             onPress={() => {
-                                navigation.navigate('CoursesStudentList', {stdurl: route.params.stdurl})
+                                navigation.navigate('CoursesStudentList', { stdurl: route.params.stdurl })
                             }}
                             style={{
                                 height: 50,
@@ -264,7 +279,7 @@ const CoursesDetials = ({ route = null }) => {
                                 學生參與名單
                             </Text>
                         </TouchableOpacity>
-   
+
                     </View>
 
                 </View>
@@ -289,6 +304,9 @@ const CoursesDetials = ({ route = null }) => {
                     }).getCourseSyllabusAndTeachingPlan(route.params.url)
                 }
             </View>
+            {/* <View style={{ height: 0 }}>
+                {renderedJSXRef.current}
+            </View> */}
             {(!refreshing && data === null) && <ActivityIndicator style={{ height: "100%", width: "100%", alignSelf: "center", backgroundColor: NYUSTTheme.colors.background, paddingBottom: 130 }} size="large" />}
         </>
     )

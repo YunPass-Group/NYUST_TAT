@@ -13,11 +13,17 @@ const Stack = createNativeStackNavigator();
 import { Cell } from "../../components/Table"
 import { YearSelectDialog } from '../../components/Dialog/';
 import CoursesDetials from '../Courses/CoursesDetials';
+import CoueseTextBooks from "../Courses/CoueseTextBooks"
 import CoursesStudentList from '../Courses/CoursesStudentList';
+import CoueseSchedule from '../Courses/CoueseSchedule';
+import coueseCoreCompetencies from '../Courses/coueseCoreCompetencies';
 
-const ClassTable = React.memo(({ semester }) => {
+const ClassTable = React.memo(({ semester}) => {
 
   const navigation = useNavigation();
+
+  // const [semester, setSemester] = React.useState(null)
+  const [semesterList, setSemesterList] = React.useState(null); // ["1121", "1112", "1111", "1102", "1101"
 
   const [account, setAccount] = React.useState(null);
   const [courses, setCourses] = React.useState(null);
@@ -65,6 +71,18 @@ const ClassTable = React.memo(({ semester }) => {
         setCourses(data);
       });
 
+    storage.load({
+      key: 'semesterList',
+      id: 'semesterList',
+    }).then((data) => {
+      // console.log(JSON.stringify(data))
+      setSemesterList(data);
+      // setSemester(data[0]);
+    }).catch((err) => {
+      //Alert
+      Alert.alert("Error", err.message);
+    });
+
   }, [])
 
   React.useEffect(() => {
@@ -83,27 +101,6 @@ const ClassTable = React.memo(({ semester }) => {
     try {
       const key = week + "_" + time;
       let result = null;
-
-      // // console.log('Processing for Week:', week, 'Time:', time);
-
-      // if (courses && courses.Courses) {
-      //   // console.log('Courses Available:', courses.Courses);
-
-      //   courses.Courses.forEach((course, index) => {
-      //     const classTime = course.ClassTime;
-      //     // console.log('Checking Course:', course['Class Name'], 'Week:', classTime.Week, 'Time:', classTime.Time);
-
-      //     if (classTime.Week === week && classTime.Time.includes(time)) {
-      //       result = {
-      //         color: tableColor[index % tableColor.length],
-      //         course: course,
-      //         detailsWebsite: course['Details Website']
-      //       };
-      //       // console.log('Match Found:', result);
-      //     }
-      //   });
-      // }
-      // console.log(courses);
       return courses[key] !== undefined ? courses[key] : null;
     } catch (err) {
       //Course not found
@@ -131,9 +128,6 @@ const ClassTable = React.memo(({ semester }) => {
   return (
     <>
       {
-        (!refreshing && courses === null) &&
-        <ActivityIndicator style={{ height: "100%", width: "100%", alignSelf: "center", backgroundColor: NYUSTTheme.colors.background }} size="large" />
-      }{
         <View style={{
           position: "absolute",
           top: 100 - 3,
@@ -239,14 +233,24 @@ const ClassTable = React.memo(({ semester }) => {
               </View>
             })
           }
+
+          {/* {semesterList && semesterList.length > 0 && semesterList.map((semester, index) => {
+            return <Button key={index} onPress={() => {
+              setSemester(semester)
+            }} title={semester} />
+          })} */}
+
           <View style={{
-            height: Platform.OS === 'ios' ? 143 : 160,
+            height: Platform.OS === 'ios' ? 140 : 160,
           }}>
 
           </View>
         </View>
       </ScrollView>
-
+      {
+        (!refreshing && courses === null) &&
+        <ActivityIndicator style={{marginBottom: 60 ,  height: "100%", width: "100%", alignSelf: "center", backgroundColor: NYUSTTheme.colors.background, position: "absolute" }} size="large" />
+      }
     </>
   )
 });
@@ -259,10 +263,13 @@ const ScreenWrapper = ({ semester }) => {
 
 const ClassTableScreen = () => {
   const [account, setAccount] = React.useState(null);
+
+
   const [semesterList, setSemesterList] = React.useState(null);
   const [selectedYear, setSelectedYear] = React.useState(null);
   const [selectionDialogVisible, setSelectionDialogVisible] = React.useState(false);
   const navigation = useNavigation();
+
   React.useEffect(() => {
 
     storage.load({ key: 'account', id: 'account' })
@@ -321,11 +328,10 @@ const ClassTableScreen = () => {
       <Stack.Navigator>
         <Stack.Screen
           name='ClassTableScreen'
-          //name={`${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`}
           children={() => <ScreenWrapper semester={selectedYear} />}
           initialParams={{ selectedYear }}
           options={{
-            
+
             headerTransparent: true,
             headerShadowVisible: true,
             headerTitle: `${!selectedYear ? '正在讀取學期列表...' : Math.trunc((parseInt(selectedYear.replace('"', '').replace('"', '')) / 10)) + "年 第" + parseInt(selectedYear.replace('"', '').replace('"', '')) % 10 + "學期 課表"}`,
@@ -392,7 +398,7 @@ const ClassTableScreen = () => {
             gestureEnabled: true,
             presentation: Platform.OS === 'ios' ? 'modal' : 'card',
             backgroundColor: 'transparent',
-            headerTransparent:  true,
+            headerTransparent: true,
             headerShadowVisible: true,
             headerBlurEffect: "regular",
             // headerLargeTitleShadowVisible: true,
@@ -408,7 +414,55 @@ const ClassTableScreen = () => {
             gestureEnabled: true,
             presentation: Platform.OS === 'ios' ? 'modal' : 'card',
             backgroundColor: 'transparent',
-            headerTransparent:  true,
+            headerTransparent: true,
+            headerShadowVisible: true,
+            headerBlurEffect: "regular",
+            // headerLargeTitleShadowVisible: true,
+            // headerLargeTitle: true,
+          }}
+        />
+        <Stack.Screen
+          name="CoursesTextBooks"
+          component={CoueseTextBooks}
+          options={{
+            ...headerOptions,
+            title: "參考教科書",
+            gestureEnabled: true,
+            presentation: Platform.OS === 'ios' ? 'modal' : 'card',
+            backgroundColor: 'transparent',
+            headerTransparent: true,
+            headerShadowVisible: true,
+            headerBlurEffect: "regular",
+            // headerLargeTitleShadowVisible: true,
+            // headerLargeTitle: true,
+          }}
+        />
+        <Stack.Screen
+          name="CoueseSchedule"
+          component={CoueseSchedule}
+          options={{
+            ...headerOptions,
+            title: "教學計畫及進度",
+            gestureEnabled: true,
+            presentation: Platform.OS === 'ios' ? 'modal' : 'card',
+            backgroundColor: 'transparent',
+            headerTransparent: true,
+            headerShadowVisible: true,
+            headerBlurEffect: "regular",
+            // headerLargeTitleShadowVisible: true,
+            // headerLargeTitle: true,
+          }}
+        />
+        <Stack.Screen
+          name="coueseCoreCompetencies"
+          component={coueseCoreCompetencies}
+          options={{
+            ...headerOptions,
+            title: "核心能力關聯",
+            gestureEnabled: true,
+            presentation: Platform.OS === 'ios' ? 'modal' : 'card',
+            backgroundColor: 'transparent',
+            headerTransparent: true,
             headerShadowVisible: true,
             headerBlurEffect: "regular",
             // headerLargeTitleShadowVisible: true,

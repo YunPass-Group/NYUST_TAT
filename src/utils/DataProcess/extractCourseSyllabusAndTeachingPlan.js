@@ -1,6 +1,6 @@
 export default function extractCourseSyllabusAndTeachingPlan(htmlContent) {
     // Replace escaped quotes to simplify regex patterns
-    htmlContent = htmlContent.replace(/\\\"/g, '"');
+    htmlContent = htmlContent.replace(/\\\"/g, '"').replace(/&amp;/g, '&');
 
     // Helper function to extract data using a pattern
     const extractData = (pattern, isMultiLine = false) => {
