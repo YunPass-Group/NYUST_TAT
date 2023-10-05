@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { NYUSTTheme } from '../../constants';
 
-const coueseCoreCompetencies = ({ route }) => {
+const CoueseCoreCompetencies = ({ route }) => {
 
     console.log(JSON.stringify(route.params.CoreCompetencies))
     const [data, setData] = React.useState(null)
@@ -90,4 +90,4 @@ const coueseCoreCompetencies = ({ route }) => {
     )
 }
 
-export default coueseCoreCompetencies;
+export default CoueseCoreCompetencies;

@@ -30,11 +30,13 @@ export default function PadBtn({
         }
     }
     return (
-        <TouchableOpacity style={{
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-        }} >
+        <TouchableOpacity
+            onPress={onPress}
+            style={{
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }} >
             <View style={{
                 backgroundColor: color,
                 borderRadius: 30,

@@ -36,7 +36,7 @@ const CoursesDetials = ({ route = null }) => {
         //if link is email
         const isEmail = link && link.includes('@') && !link.includes('http');
 
-        return <View style={{ paddingHorizontal: 30, paddingVertical: 15, flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center', backgroundColor: dark ? NYUSTTheme.colors.background : '#1C333D' }}>
+        return <View style={{ paddingHorizontal: 30, paddingVertical: 30, flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center', backgroundColor: dark ? NYUSTTheme.colors.background : '#1C333D' }}>
             <View>
                 <View style={{ flex: 1, flexDirection: 'row', gap: 10 }}>
                     <Foundation name="paperclip" size={24} color={NYUSTTheme.colors.text} />
@@ -46,6 +46,7 @@ const CoursesDetials = ({ route = null }) => {
                 </View>
                 <View style={{
                     flex: 1,
+                    marginTop: 10,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
@@ -140,22 +141,22 @@ const CoursesDetials = ({ route = null }) => {
                 </Text>
                 {
                     data &&
-                    [['課程名稱:', [data['Information']['courseName'], data['Information']['courseNameEnglish']]],
-                    ['系所課號:', [data['Information']['curriculumNo']]],
-                    ['學年期 / 課號:', [`${[data['Information']['semester']]} - ${[data['Information']['semesterType']]} / ${[data['Information']['serialNo']]}`]],
-                    ['修別:', [data['Information']['requiredElective']]],
-                    ['授課方式:', [data['Information']['courseType']]],
-                    ['開課班級:', [data['Information']['class']]],
-                    ['講授-實習-學分:', [data['Information']['credits']]],
-                    ['上課時間教室:', [data['Information']['scheduleClassroom']]],
-                    ['授課教師(教師所屬系所):', [`${data['Information']['instructorDepartment']['name']}(${data['Information']['instructorDepartment']['department']})`], data['Information']['instructorDepartment']['email']],
-                    ['教師聯絡資訊E-mail及分機(可洽詢教師所屬系所):', [data['Information']['instructorEmailAndExt']]],
-                    ['備註:', [data['Information']['instructor']]],
-                    ['課程簡介:', data['Information']['courseIntroduction']],
-                    ['教學目標:', data['Information']['teachingObjectives']],
-                    ['評量方式:', data['Information']['evaluationMethods']],
-                    ['課業輔導時間:', [data['Information']['officeHours']]],
-                    ['教材網站資訊:', [data['Information']['teachingMaterials']], data['Information']['teachingMaterials']],
+                    [['課程名稱', [data['Information']['courseName'], data['Information']['courseNameEnglish']]],
+                    ['系所課號', [data['Information']['curriculumNo']]],
+                    ['學年期 / 課號', [`${[data['Information']['semester']]} - ${[data['Information']['semesterType']]} / ${[data['Information']['serialNo']]}`]],
+                    ['修別', [data['Information']['requiredElective']]],
+                    ['授課方式', [data['Information']['courseType']]],
+                    ['開課班級', [data['Information']['class']]],
+                    ['講授-實習-學分', [data['Information']['credits']]],
+                    ['上課時間/教室', [data['Information']['scheduleClassroom']]],
+                    ['授課教師(教師所屬系所)', [`${data['Information']['instructorDepartment']['name']}(${data['Information']['instructorDepartment']['department']})`], data['Information']['instructorDepartment']['email']],
+                    ['教師聯絡資訊E-mail及分機(可洽詢教師所屬系所)', [data['Information']['instructorEmailAndExt']]],
+                    ['備註', [data['Information']['instructor']]],
+                    ['課程簡介', data['Information']['courseIntroduction']],
+                    ['教學目標', data['Information']['teachingObjectives']],
+                    ['評量方式', data['Information']['evaluationMethods']],
+                    ['課業輔導時間', [data['Information']['officeHours']]],
+                    ['教材網站資訊', [data['Information']['teachingMaterials']], data['Information']['teachingMaterials']],
                     ].map((item, index) => (
                         <DataBox
                             key={index}
@@ -224,7 +225,7 @@ const CoursesDetials = ({ route = null }) => {
 
                         <TouchableOpacity
                             onPress={() => {
-                                navigation.navigate('coueseCoreCompetencies', { CoreCompetencies: data['CoreCompetencies']})
+                                navigation.navigate('CoueseCoreCompetencies', { CoreCompetencies: data['CoreCompetencies']})
                             }}
                             style={{
                                 height: 50,

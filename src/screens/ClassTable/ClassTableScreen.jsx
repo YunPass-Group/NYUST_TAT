@@ -16,7 +16,7 @@ import CoursesDetials from '../Courses/CoursesDetials';
 import CoueseTextBooks from "../Courses/CoueseTextBooks"
 import CoursesStudentList from '../Courses/CoursesStudentList';
 import CoueseSchedule from '../Courses/CoueseSchedule';
-import coueseCoreCompetencies from '../Courses/coueseCoreCompetencies';
+import CoueseCoreCompetencies from '../Courses/CoueseCoreCompetencies';
 
 const ClassTable = React.memo(({ semester}) => {
 
@@ -454,8 +454,8 @@ const ClassTableScreen = () => {
           }}
         />
         <Stack.Screen
-          name="coueseCoreCompetencies"
-          component={coueseCoreCompetencies}
+          name="CoueseCoreCompetencies"
+          component={CoueseCoreCompetencies}
           options={{
             ...headerOptions,
             title: "核心能力關聯",

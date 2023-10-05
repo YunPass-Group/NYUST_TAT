@@ -72,7 +72,7 @@ const CoueseTextBooks = ({ route }) => {
                                 style: "cancel"
                             },
                             {
-                                text: "複製年份",
+                                text: "複製出版年",
                                 onPress: async () => { 
                                     await Clipboard.setStringAsync(value["出版年"]);
                                 },

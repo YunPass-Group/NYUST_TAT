@@ -70,7 +70,7 @@ const CoursesStudentList = ({ route }) => {
         {value.studentEnglishName}
       </Text> */}
       <Text
-        style={{ width: "25%", fontWeight: 'normal', fontSize: 15, color: NYUSTTheme.colors.text, alignSelf: "center" }}>
+        style={{ width: "30%", fontWeight: 'normal', fontSize: 15, color: NYUSTTheme.colors.text, alignSelf: "center" }}>
         {value.studentNumber}
       </Text>
       

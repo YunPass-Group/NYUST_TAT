@@ -5,9 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { NYUSTTheme } from '../../constants/';
 import Student from "../../utils/Student";
 import { BlurView } from "expo-blur";
+import { useNavigation } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import SchoolMap from "./SchoolMap";
 
 //components
 import { PadBtn } from "../../components/Buttons";
@@ -18,6 +21,7 @@ import storage from "../../utils/storage";
 const Stack = createNativeStackNavigator();
 function Home() {
 
+  const navigation = useNavigation();
 
   const [student, setStudent] = useState(null);
 
@@ -202,7 +206,7 @@ function Home() {
               <PadBtn text="我的工讀" icon='ios-briefcase' iconPack='Ionicons' />
               <PadBtn text="活動報名" icon='file-signature' iconPack='FontAwesome5' />
               <PadBtn text="分機查詢" icon='card-account-phone' iconPack='MaterialCommunityIcons' />
-              <PadBtn text="校園地圖" icon='map' iconPack='Foundation' />
+              <PadBtn text="校園地圖" icon='map' iconPack='Foundation' onPress={() => {navigation.navigate('SchoolMap')}}/>
               <PadBtn text='館藏查詢' icon='swatchbook' iconPack='FontAwesome5' />
               <PadBtn text="交通時刻" icon='ios-train-outline' iconPack='Ionicons' />
               {/* <PadBtn />
@@ -219,6 +223,31 @@ function Home() {
 }
 
 export default HomeScreen = () => {
+
+  const headerOptions = Platform.OS === 'android' ? {
+    headerBackground: () => (
+      <BlurView
+        tint="dark"
+        intensity={100}
+        style={StyleSheet.absoluteFill}
+      />
+    ),
+    headerLeft: () => (
+      <TouchableOpacity style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginLeft: 10,
+      }} onPress={() => navigation.navigate('ClassTableScreen')} >
+        <Ionicons name="ios-chevron-back" size={24} color={NYUSTTheme.colors.primary} />
+        <Text style={{
+          fontSize: 18,
+          color: NYUSTTheme.colors.primary,
+        }}>回{selectedYear && selectedYear.replace('"', '').replace('"', '')}課表</Text>
+      </TouchableOpacity>
+    ),
+  } : {};
+
   return (
     <>
       <Stack.Navigator>
@@ -227,15 +256,23 @@ export default HomeScreen = () => {
           component={Home}
           options={{
             headerShown: false,
-            // title: "歡迎",
-            // headerLargeTitle: true,
+
+          }}
+        />
+        <Stack.Screen
+          name="SchoolMap"
+          component={SchoolMap}
+          options={{
+            ...headerOptions,
+            title: "校園地圖",
+            gestureEnabled: true,
+            presentation: Platform.OS === 'ios' ? 'modal' : 'card',
+            backgroundColor: 'transparent',
+            headerTransparent: true,
+            headerShadowVisible: true,
+            headerBlurEffect: "regular",
             // headerLargeTitleShadowVisible: true,
-            // headerBlurEffect: "prominent",
-            // headerTransparent: true,
-            // headerShadowVisible: true,
-            // headerStyle: {
-            //   backgroundColor: Platform.OS === 'ios' ? 'transparent' : 'rgba(255, 255, 255, 255)', // semi-transparent white for Android
-            // },
+            // headerLargeTitle: true,
           }}
         />
 
